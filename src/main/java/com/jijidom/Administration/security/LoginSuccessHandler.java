@@ -26,12 +26,9 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         for (GrantedAuthority li:authentication.getAuthorities()){
             System.out.println(((MyGrantedAuthority)li).getAuthority());
         }
-        System.out.println("IP :"+getIpAddress(request));
         try {
-            System.out.println("正常");
             super.onAuthenticationSuccess(request, response, authentication);
         }catch (Exception e){
-            System.out.println("错误");
         }
     }
 

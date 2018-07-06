@@ -20,10 +20,10 @@ public class SysController {
     @Autowired
     UserJPA userJPA;
 
-    @RequestMapping(value="/login",method=RequestMethod.GET)
+    /*@RequestMapping(value="/login",method=RequestMethod.GET)
     public ModelAndView login(ModelMap map){
         return new ModelAndView("html/login",map);
-    }
+    }*/
 
     @RequestMapping(value="/home",method=RequestMethod.GET)
     public ModelAndView root(ModelMap map) {

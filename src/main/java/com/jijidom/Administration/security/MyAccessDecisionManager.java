@@ -6,6 +6,7 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,9 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
         HttpServletRequest request = ((FilterInvocation) object).getHttpRequest();
         String url, method;
         AntPathRequestMatcher matcher;
-
+        System.out.println(configAttributes.toString());
+        System.out.println(authentication.getPrincipal().toString());
+        System.out.println(authentication.getAuthorities().toString());
         for (GrantedAuthority ga : authentication.getAuthorities()) {
             if (ga instanceof MyGrantedAuthority) {
                 MyGrantedAuthority urlGrantedAuthority = (MyGrantedAuthority) ga;

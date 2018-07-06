@@ -46,7 +46,7 @@ public class WebConfig extends WebMvcConfigurerAdapter implements ApplicationCon
     //此时就跳转到/WEB-INF/jsp/index.jsp页面
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("login").setViewName("html/login");
+        registry.addViewController("/login").setViewName("html/login");
         super.addViewControllers(registry);
     }
 }
