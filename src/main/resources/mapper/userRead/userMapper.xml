@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jijidom.Administration.dao.read.UserMapper" >
+    <resultMap id="userMap" type="User">
+        <id property="id" column="ID"/>
+        <result property="uuid" column="UUID"/>
+        <result property="uid_a" column="UID_A"/>
+        <result property="uid_b" column="UID_B"/>
+        <result property="uid_c" column="UID_C"/>
+        <result property="passWord" column="PASSWORD"/>
+        <result property="nickName" column="NICKNAME"/>
+        <result property="email" column="EMAIL"/>
+        <result property="img" column="IMG"/>
+        <result property="status" column="STATUS"/>
+        <collection property="roles" ofType="com.jijidom.Administration.entity.Role">
+            <id property="id" column="ID"/>
+            <result property="name" column="NAME"/>
+        </collection>
+    </resultMap>
+    <insert id="insert" parameterType="User">
+        <selectKey resultType="java.lang.Integer" keyProperty="UUID" keyColumn="UUID">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO USER(
+          ID,UUID,UID_A,UID_B,UID_C,PASSWORD,NICKNAME,EMAIL,IMG,STATUS,CREATEBY,CREATEDATE,UPDATEBY,UPDATEDATE,DELFLAG
+        )VALUES(
+          #{id},#{uuid},#{uid_a},#{uid_b},#{uid_c},#{password},#{nickName},#{email},#{img},#{status},#{createBy},#{createDate},#{updateBy},#{updateDate},#{delFlag}
+        )
+    </insert>
+    <select id="getAll" resultType="User">
+        SELECT
+          ID AS "id",UUID AS "uuid",UID_A AS "uid_a",UID_B AS "uid_b",UID_C AS "uid_c",PASSWORD AS "password",
+          NICKNAME AS "nickName",EMAIL AS "email",IMG AS "img",STATUS AS "status",CREATEBY AS "createBy",CREATEDATE AS "createDate",
+          UPDATEBY AS "updateBy",UPDATEDATE AS "updateDate",DELFLAG AS "delFlag"
+        FROM USER
+    </select>
+    <select id="findByUserName" parameterType="String" resultMap="userMap">
+		select u.*
+		,r.ID,r.NAME
+		from user u
+        LEFT JOIN role_user ru on u.ID= ru.USER_ID
+        LEFT JOIN role r on ru.ROLE_ID=r.ID
+        where u.UUID= #{username}
+	</select>
+</mapper>

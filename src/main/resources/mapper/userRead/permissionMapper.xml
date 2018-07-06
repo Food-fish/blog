@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jijidom.Administration.dao.read.PermissionMapper" >
+    <select id="getAll" resultType="Permission">
+        SELECT
+          ID AS "id",NAME AS "name",DESCRIPTION AS "description",URL AS "url",PID AS "pid",METHOD AS "method",
+          CREATEBY AS "createBy",CREATEDATE AS "createDate",UPDATEBY AS "updateBy",UPDATEDATE AS "updateDate",DELFLAG AS "delFlag"
+        FROM permission
+    </select>
+    <select id="findByAdminUserId" parameterType="String" resultType="Permission">
+        SELECT p.*
+            FROM user u
+            LEFT JOIN role_user sru on u.id= sru.USER_ID
+            LEFT JOIN role r on sru.ROLE_ID=r.ID
+            LEFT JOIN permission_role spr on spr.ROLE_ID=r.ID
+            LEFT JOIN permission p on p.id =spr.PERMISSION_ID
+        WHERE u.ID=#{userId}
+    </select>
+</mapper>
