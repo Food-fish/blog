@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class SysController {
@@ -20,15 +22,16 @@ public class SysController {
     @Autowired
     UserJPA userJPA;
 
-    /*@RequestMapping(value="/login",method=RequestMethod.GET)
+    @RequestMapping(value="/login")
     public ModelAndView login(ModelMap map){
         return new ModelAndView("html/login",map);
-    }*/
+    }
 
-    @RequestMapping(value="/home",method=RequestMethod.GET)
+    @RequestMapping(value="/home")
     public ModelAndView root(ModelMap map) {
-        map.put("msg", "登录页面");
-        System.out.println("登录成功");
+        map.put("title", "登录页面");
+        map.put("content", "123");
+        map.put("etraInfo", "456");
         return new ModelAndView("html/home",map);
     }
 

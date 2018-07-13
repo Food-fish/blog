@@ -1,17 +1,16 @@
 package com.jijidom.Administration.security;
 
-import org.springframework.beans.factory.InitializingBean;
+import com.jijidom.Administration.entity.Permission;
+import com.jijidom.Administration.jpa.PermissionJPA;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Service;
-import org.springframework.util.AntPathMatcher;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -20,30 +19,47 @@ import java.util.*;
 @Service
 public class MyInvocationSecurityMetadataSourceService implements FilterInvocationSecurityMetadataSource {
 
-    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
-    private final Map<String,String> urlRoleMap = new HashMap<String,String>(){{
-        put("/css/**","ROLE_ANONYMOUS");
-        put("/login","ROLE_ANONYMOUS");
-        put("/home","ROLE_ADMIN");
-    }};
+    @Autowired
+    private PermissionJPA permissionJPA;
 
+    private HashMap<String, Collection<ConfigAttribute>> map =null;
+
+    /**
+     * 加载权限表中所有权限
+     */
+    public void loadResourceDefine(){
+        map = new HashMap<>();
+        Collection<ConfigAttribute> array;
+        ConfigAttribute cfg;
+        List<Permission> permissions = permissionJPA.findAll();
+        for(Permission permission : permissions) {
+            array = new ArrayList<>();
+            cfg = new SecurityConfig(permission.getName());
+            array.add(cfg);
+            map.put(permission.getUrl(), array);
+        }
+
+    }
 
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
-        FilterInvocation fi = (FilterInvocation) object;
-        String url = fi.getRequestUrl();
-        Collection<ConfigAttribute> co=new ArrayList<>();
-        for(Map.Entry<String,String> entry:urlRoleMap.entrySet()){
-            if(antPathMatcher.match(entry.getKey(),url)){
-                return SecurityConfig.createList(entry.getValue());
+        if(map ==null) loadResourceDefine();
+        HttpServletRequest request = ((FilterInvocation) object).getHttpRequest();
+        AntPathRequestMatcher matcher;
+        String resUrl;
+        for(Iterator<String> iter = map.keySet().iterator(); iter.hasNext(); ) {
+            resUrl = iter.next();
+            matcher = new AntPathRequestMatcher(resUrl);
+            if(matcher.matches(request)) {
+                return map.get(resUrl);
             }
         }
-        return SecurityConfig.createList("ROLE_USER");
+        return null;
     }
 
     @Override
     public Collection<ConfigAttribute> getAllConfigAttributes() {
-        return new ArrayList<ConfigAttribute>();
+        return null;
     }
 
     @Override

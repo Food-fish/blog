@@ -1,9 +1,6 @@
 package com.jijidom.Administration.config;
 
-import com.jijidom.Administration.security.CustomUserService;
-import com.jijidom.Administration.security.LoginSuccessHandler;
-import com.jijidom.Administration.security.MyAccessDecisionManager;
-import com.jijidom.Administration.security.MyInvocationSecurityMetadataSourceService;
+import com.jijidom.Administration.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +31,6 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     @Override
     @Bean
     public UserDetailsService userDetailsService() { //注册UserDetailsService 的bean
@@ -55,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService()); //user Details Service验证
-        auth.eraseCredentials(false);
+        //auth.eraseCredentials(false);
     }
 
     @Override
@@ -64,15 +60,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(filterSecurityInterceptor())
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET,"/css/**").permitAll()
                 .anyRequest().authenticated() //任何请求,登录后可以访问
-                .and().formLogin().loginPage("/login")
-                /*.passwordParameter("password")//form表单用户名参数名
+                .and().formLogin().loginPage("/login.html")
+                .passwordParameter("password")//form表单用户名参数名
                 .usernameParameter("username") //form表单密码参数名
                 .loginProcessingUrl("/login")//form表单POST请求url提交地址
-                .failureForwardUrl("/loginPage")//登录失败跳转地址*/
-                .loginProcessingUrl("/logins")
-                .successForwardUrl("/home").permitAll()
+                .failureForwardUrl("/login?error")//登录失败跳转地址
+                .loginProcessingUrl("/login")//form表单POST请求url提交地址，默认为/login
+                .successForwardUrl("/home")//登录成功跳转地址
+                .permitAll()
                 .successHandler(loginSuccessHandler()) //登录成功后可使用loginSuccessHandler()存储用户信息，可选。
                 .and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll()
                 .invalidateHttpSession(true)//注销后使session相关信息无效
@@ -82,10 +78,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         //忽略css.jq.img等文件
+        web.ignoring().antMatchers("/css/**");
         super.configure(web);
-        //web.ignoring().antMatchers("/css/**");
-        //web.securityInterceptor(myFilterSecurityInterceptor);
-        //web.privilegeEvaluator(customWebInvocationPrivilegeEvaluator());
     }
 
     @Autowired
@@ -106,4 +100,3 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return filterSecurityInterceptor;
     }
 }
-

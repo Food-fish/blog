@@ -34,12 +34,12 @@ body {
      <div class="container">
 
       <div class="starter-template">
-      	<h1 th:text="${msg.title}"></h1>
+      	<h1 th:text="${title}"></h1>
 		
-		<p class="bg-primary" th:text="${msg.content}"></p>
-		
+		<p class="bg-primary" th:text="${content}"></p>
+          <h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
 		<div sec:authorize="hasRole('ROLE_HOME')"> <!-- 用户类型为ROLE_ADMIN 显示 -->
-		 	<p class="bg-info" th:text="${msg.etraInfo}"></p>
+		 	<p class="bg-info" th:text="${etraInfo}"></p>
 		</div>
           <div sec:authorize="hasRole('ROLE_ADMIN')"> <!-- 用户类型为ROLE_ADMIN 显示 -->
               <p class="bg-info">恭喜您,您有 ROLE_ADMIN 权限 </p>
