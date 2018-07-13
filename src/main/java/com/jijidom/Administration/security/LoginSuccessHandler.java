@@ -29,15 +29,14 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         //获得授权后可得到用户信息   可使用SUserService进行数据库操作
         RequestCache requestCache = new HttpSessionRequestCache();
         User userDetails = (User)authentication.getPrincipal();
-        //输出登录提示信息
-        System.out.println("管理员 " + userDetails.getUsername() + " 登录");
-        System.out.println("管理员 " + request.getRequestURI() + " 登录");
         try {
             logger.info("用户"+userDetails.getUsername()+"登录成功，登录IP为" + this.getIpAddress(request));
         }catch (Exception e){
         }
         String url = null;
         SavedRequest savedRequest = requestCache.getRequest(request,response);
+        System.out.println(savedRequest);
+        System.out.println(url);
         if(savedRequest != null){
             url = savedRequest.getRedirectUrl();
         }

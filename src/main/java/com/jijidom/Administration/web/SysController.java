@@ -36,7 +36,7 @@ public class SysController {
     }
 
     @ResponseBody
-    @RequestMapping(value="/getAllUser",method=RequestMethod.GET)
+    @RequestMapping(value="/getAllUser")
     public List<User> getUser(Integer page, Integer rows) {
         userJPA.findAll();
         return userService.getAllUser();

@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
@@ -31,6 +33,9 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    SessionRegistry sessionRegistry;
+
     @Override
     @Bean
     public UserDetailsService userDetailsService() { //注册UserDetailsService 的bean
@@ -41,6 +46,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public LoginSuccessHandler loginSuccessHandler(){
         return new LoginSuccessHandler();
+    }
+
+    @Bean
+    public SessionRegistry getSessionRegistry(){
+        SessionRegistry sessionRegistry=new SessionRegistryImpl();
+        return sessionRegistry;
     }
 
     @Override
@@ -61,24 +72,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .anyRequest().authenticated() //任何请求,登录后可以访问
-                .and().formLogin().loginPage("/login.html")
+                .and()
+                .sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry)
+                .and().and().formLogin().loginPage("/login.html")
                 .passwordParameter("password")//form表单用户名参数名
                 .usernameParameter("username") //form表单密码参数名
                 .loginProcessingUrl("/login")//form表单POST请求url提交地址
-                .failureForwardUrl("/login?error")//登录失败跳转地址
+                .failureForwardUrl("/login.html?error")//登录失败跳转地址
                 .loginProcessingUrl("/login")//form表单POST请求url提交地址，默认为/login
-                .successForwardUrl("/home")//登录成功跳转地址
                 .permitAll()
                 .successHandler(loginSuccessHandler()) //登录成功后可使用loginSuccessHandler()存储用户信息，可选。
                 .and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll()
                 .invalidateHttpSession(true)//注销后使session相关信息无效
-                .and().rememberMe();
+                .clearAuthentication(true)
+                .and().rememberMe()
+                .and().httpBasic();
+        http.headers().frameOptions().sameOrigin();// 设置可以iframe访问
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         //忽略css.jq.img等文件
-        web.ignoring().antMatchers("/css/**");
+        web.ignoring().antMatchers("/css/**","/druid/**");
         super.configure(web);
     }
 
